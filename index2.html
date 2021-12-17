@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style> /* set the CSS */
+
+body { font: 12px Arial;}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: black;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
+.polygon {
+	fill: blue;
+	}
+
+
+</style>
+<body>
+
+<!-- load the d3.js library -->    
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="https://d3js.org/d3-polygon.v1.min.js"></script>
+<script>
+//pentagon code
+
+// Set the dimensions of the canvas / graph
+var margin = {top: 30, right: 20, bottom: 30, left: 50},
+    width = 1200 - margin.left - margin.right,
+    height = 600 - margin.top - margin.bottom;
+
+// Set the ranges
+var x = d3.scale.linear().domain([0,200]).range([0, 1000]);
+var y = d3.scale.linear().domain([0,100]).range([500, 0]);
+
+// Define the axes
+var xAxis = d3.svg.axis().scale(x)
+    .orient("bottom").ticks(5);
+
+var yAxis = d3.svg.axis().scale(y)
+    .orient("left").ticks(5);
+
+var drag = d3.behavior.drag()
+    .on("drag", dragged);
+// Adds the svg canvas
+var angleArray = [90,30,-30,-90,-150,150];
+
+function toRadians(angle) {
+  return angle * (Math.PI / 180);
+}
+
+	var polyCast = [];
+	var equidistance = (Math.sqrt(width))/5;
+	var hexaValue = (equidistance/2) / (Math.cos((30 * (Math.PI / 180))));
+	
+function xValue(alpha, originA){
+	return (originA + (hexaValue * Math.cos(toRadians(alpha))))
+	}
+	
+function yValue(beta, originB){
+	return (originB + (hexaValue * Math.sin(toRadians(beta))))
+	}
+	
+var castOff;
+function polyAssembler(oriA,oriB){
+	castOff = [];
+	angleArray.forEach(function(d){
+		let caster = [xValue(d,oriA), yValue(d,oriB)];
+		castOff.push(caster);
+	// 	console.log(xValue(d,oriA),yValue(d,oriB),d)
+		});
+	polyCast.push(castOff);
+}
+
+	var horizontalSpacer = 0;
+	var verticalSpacer = 0;
+		horizontalSpacer = width/equidistance;
+		verticalSpacer = height/(hexaValue*2);
+	var dotGrid = [];
+	
+function dotGridData(){
+	for(let q = 0; q < 18; q++){
+		for(let p = 0; p < 20; p++){
+		 let inter = (equidistance/2)*(q%2) + (p*equidistance);
+		 let enter = (hexaValue*1.5)*q;
+		 let combo = [];
+		 combo.push(inter);
+		 combo.push(enter);
+		 dotGrid.push(combo);
+		 }
+	}
+}
+function hexLineTester(){
+	dotGrid.forEach(function (d){
+		polyAssembler(d[0],d[1]);
+	});
+}
+
+dotGridData();
+hexLineTester();
+var bpoly = [[35,20], [65,20], [75,50], [50,70], [25,50]];
+var svg = d3.select("body")
+    .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+        .attr("transform","translate(" + margin.left + "," + margin.top + ")");	      	 
+svg.selectAll("polygon")
+		.data(polyCast)
+		.enter().append("polygon")
+		.style("fill", "white")
+		.attr("stroke", "black")
+		.on('mouseover', function (d, i) {
+    		d3.select(this).transition()
+        	.duration('50')
+            .attr('stroke-width','2')})
+        .on('mouseout', function (d, i) {
+        	d3.select(this).transition()
+            .duration('50')
+            .attr('stroke-width','1')})
+		.attr("points",function(d) { 
+			return d.map(function(d) {
+				return [x(d[0]),y(d[1])].join(",");
+			}).join(" ");
+		});
+
+function dragged(){
+		let Dx = x.invert(d3.event.x);
+		let Dy = y.invert(d3.event.y);
+		//console.log(Dx,Dy);
+		let pPoints = [Dx,Dy];
+		d3.select(this).attr("cx", d3.event.x).attr("cy", d3.event.y)
+}
+
+</script>
+</body>
