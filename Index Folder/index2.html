@@ -44,7 +44,7 @@ var yAxis = d3.svg.axis().scale(y)
 var drag = d3.behavior.drag()
     .on("drag", dragged);
 // Adds the svg canvas
-var angleArray = [90,30,-30,-90,-150,150];
+const angleArray = [90,30,-30,-90,-150,150];
 
 function toRadians(angle) {
   return angle * (Math.PI / 180);
@@ -62,9 +62,8 @@ function yValue(beta, originB){
 	return (originB + (hexaValue * Math.sin(toRadians(beta))))
 	}
 	
-var castOff;
 function polyAssembler(oriA,oriB){
-	castOff = [];
+	let castOff = [];
 	angleArray.forEach(function(d){
 		let caster = [xValue(d,oriA), yValue(d,oriB)];
 		castOff.push(caster);
@@ -82,13 +81,13 @@ function polyAssembler(oriA,oriB){
 function dotGridData(){
 	for(let q = 0; q < 18; q++){
 		for(let p = 0; p < 20; p++){
-		 let inter = (equidistance/2)*(q%2) + (p*equidistance);
-		 let enter = (hexaValue*1.5)*q;
-		 let combo = [];
-		 combo.push(inter);
-		 combo.push(enter);
-		 dotGrid.push(combo);
-		 }
+			let inter = (equidistance/2)*(q%2) + (p*equidistance);
+			let enter = (hexaValue*1.5)*q;
+			let combo = [];
+			combo.push(inter);
+			combo.push(enter);
+			dotGrid.push(combo);
+		}
 	}
 }
 function hexLineTester(){
@@ -99,7 +98,6 @@ function hexLineTester(){
 
 dotGridData();
 hexLineTester();
-var bpoly = [[35,20], [65,20], [75,50], [50,70], [25,50]];
 var svg = d3.select("body")
     .append("svg")
         .attr("width", width + margin.left + margin.right)
